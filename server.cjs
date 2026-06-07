@@ -3,19 +3,18 @@ const cors = require("cors");
 const docs = require("./knowledge.cjs");
 
 const app = express();
+
 app.use(cors());
 
 app.get("/", (req, res) => {
-
   res.send("Backend is running!");
-
 });
 
 app.get("/hello", (req, res) => {
-  res.json({ 
+  res.json({
     name: "Dilara",
     company: "Intuit",
-    role: "Software Engineer"
+    message: "Welcome!"
   });
 });
 
@@ -44,12 +43,23 @@ app.get("/ask", (req, res) => {
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
 
+  if (topDocs.length === 0) {
+    return res.json({
+      answer: "I could not find enough information in the knowledge base.",
+      sources: []
+    });
+  }
+
+  const context = topDocs.map((doc) => doc.text).join(" ");
+
+  const generatedAnswer = `Based on the retrieved company knowledge: ${context}`;
+
   res.json({
-    answer: topDocs.length > 0 ? topDocs[0].text : "I could not find an answer.",
+    answer: generatedAnswer,
     sources: topDocs
   });
-  
 });
+
 app.listen(3000, () => {
   console.log("Server started on http://localhost:3000");
 });
