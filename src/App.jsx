@@ -8,6 +8,12 @@ function App() {
   return (
     <div>
       <h1>Intuit AI Assistant</h1>
+      <textarea
+        rows="10"
+        cols="80"
+        placeholder="Your conversation will appear here..."
+      ></textarea>
+      <br />
       <input placeholder="Ask a question" />
       <button>Ask</button>
     </div>
