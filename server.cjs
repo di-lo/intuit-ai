@@ -1,13 +1,9 @@
 const express = require("express");
+const cors = require("cors");
+const docs = require("./knowledge.cjs");
 
 const app = express();
-
-const docs = [
-  "Interns can ask their manager about vacation days.",
-  "The AI assistant project uses React, Express, REST APIs, JSON, and GitHub.",
-  "Frontend code lives in React. Backend code lives in Express.",
-  "Developers should create a new Git branch for every feature."
-];
+app.use(cors());
 
 app.get("/", (req, res) => {
 
@@ -25,32 +21,35 @@ app.get("/hello", (req, res) => {
 
 app.get("/ask", (req, res) => {
   const question = req.query.question.toLowerCase();
-
   const words = question.split(" ");
 
-  let bestDoc = "";
-  let bestScore = 0;
-
-  for (const doc of docs) {
+  const scoredDocs = docs.map((doc) => {
     let score = 0;
 
     for (const word of words) {
-      if (doc.toLowerCase().includes(word)) {
+      if (doc.text.toLowerCase().includes(word)) {
         score++;
       }
     }
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestDoc = doc;
-    }
-  }
+    return {
+      id: doc.id,
+      text: doc.text,
+      score: score
+    };
+  });
+
+  const topDocs = scoredDocs
+    .filter((doc) => doc.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 
   res.json({
-    answer: bestDoc || "I could not find an answer."
+    answer: topDocs.length > 0 ? topDocs[0].text : "I could not find an answer.",
+    sources: topDocs
   });
+  
 });
-
 app.listen(3000, () => {
   console.log("Server started on http://localhost:3000");
 });
