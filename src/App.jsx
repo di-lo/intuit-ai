@@ -5,6 +5,17 @@ import heroImg from './assets/hero.png'
 import './App.css'
 
 function App() {
+  const [message, setMessage] = useState("");
+
+  async function askBackend() {
+
+    const response = await fetch("http://localhost:3000/hello");
+
+    const data = await response.json();
+
+    setMessage(data.message);
+
+  }
   return (
     <div>
       <h1>Intuit AI Assistant</h1>
@@ -15,7 +26,8 @@ function App() {
       ></textarea>
       <br />
       <input placeholder="Ask a question" />
-      <button>Ask</button>
+      <button onClick={askBackend}>Ask</button>
+      <h2>{message}</h2>
     </div>
   );
 }
