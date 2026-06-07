@@ -26,12 +26,28 @@ app.get("/hello", (req, res) => {
 app.get("/ask", (req, res) => {
   const question = req.query.question.toLowerCase();
 
-  const result = docs.find((doc) =>
-    doc.toLowerCase().includes(question)
-  );
+  const words = question.split(" ");
+
+  let bestDoc = "";
+  let bestScore = 0;
+
+  for (const doc of docs) {
+    let score = 0;
+
+    for (const word of words) {
+      if (doc.toLowerCase().includes(word)) {
+        score++;
+      }
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestDoc = doc;
+    }
+  }
 
   res.json({
-    answer: result || "I could not find an answer."
+    answer: bestDoc || "I could not find an answer."
   });
 });
 
